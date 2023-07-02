@@ -10,7 +10,6 @@ def store(request, category_slug=None):
         products=Product.objects.filter(category=categories, is_available=True)
         product_count = products.count()
     else:
-        
         products = Product.objects.all().filter(is_available=True)
         product_count = products.count()
     context = {
