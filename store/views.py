@@ -6,6 +6,7 @@ from carts.views import _cart_id
 from django.core.paginator import Paginator
 from django.db.models import Q
 
+
 def store(request, category_slug=None):
     categories = None
     products = None
@@ -34,8 +35,8 @@ def store(request, category_slug=None):
         'product_count': product_count,
         'in_cart': in_cart,
     }
+    
     return render(request, 'store/store.html', context)
-
 
 
 def product_detail(request, category_slug, product_slug):
@@ -49,6 +50,7 @@ def product_detail(request, category_slug, product_slug):
         'product': product,
         'in_cart': in_cart,
     }
+    
     return render(request, 'store/product_detail.html', context)
 
 
@@ -64,4 +66,5 @@ def search(request):
         'products': products,
         'product_count': product_count,
     }
+    
     return render(request, 'store/store.html', context)
