@@ -59,13 +59,13 @@
               </div>
           </div> 
           <hr>
-          <!-- cart button updated -->
+          <!-- cart button -->
           {% if product.stock <= 0 %}
           <h5 class="text-danger">Out of Stock</h5>
           {% else %}
           <button type="submit" class="btn  btn-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i> </button>
-          {% endif %} 
           <a href="{% url 'cart' %}" class="btn  btn-success"> <span class="text">View Cart</span> <i class="fas fa-shopping-cart"></i> </a>
+          {% endif %} 
 
       </article> <!-- product-info-aside .// -->
   </form>
