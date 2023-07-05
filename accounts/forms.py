@@ -1,7 +1,7 @@
 from django import forms
 from .models import Account
 
-class RegistrationFrom(forms.ModelForm):
+class RegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput(attrs={
         'placeholder' : 'Enter Password',
     }))
@@ -13,7 +13,7 @@ class RegistrationFrom(forms.ModelForm):
         fields = ['first_name', 'last_name', 'email', 'phone_number', 'password']
         
     def __init__(self, *args, **kwargs):
-        super(RegistrationFrom, self).__init__(*args, **kwargs)
+        super(RegistrationForm, self).__init__(*args, **kwargs)
         self.fields['first_name'].widget.attrs['placeholder'] = 'Enter first name'
         self.fields['last_name'].widget.attrs['placeholder'] = 'Enter last name'
         self.fields['email'].widget.attrs['placeholder'] = 'Enter email'
