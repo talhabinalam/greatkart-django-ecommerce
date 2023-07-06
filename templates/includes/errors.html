@@ -11,11 +11,11 @@
 
 
 {% if form.non_field_errors %}
-  {% for error in form.non_field_errors %}
-    <div class="alert alert-danger alert-dismissible" role="alert">
+<div class="alert alert-danger alert-dismissible" role="alert">
+      {% for error in form.non_field_errors %}
+      {{ error }}
       <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span>
       </button>
-      {{ error }}
     </div>
   {% endfor %}
 {% endif %}
