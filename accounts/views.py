@@ -48,4 +48,5 @@ def login(request):
 
 def logout(request):
     # logout function wil be implemented
+    
     return render(request, 'accounts/login.html')
