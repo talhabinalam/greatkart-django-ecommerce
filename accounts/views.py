@@ -13,6 +13,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
+import requests
 
 
 def register(request):
@@ -96,9 +97,19 @@ def login(request):
                                 item.save()
             except:
                 pass
+            
             auth.login(request, user)
             messages.success(request, "Welcome! You are now logged in.")
-            return redirect('dashboard')
+            url = request.META.get('HTTP_REFERER')
+            try:
+                query = requests.utils.urlparse(url).query
+                params = dict(x.split('=') for x in query.split('&'))
+                if 'next' in params:
+                    next_page = params['next']
+                    return redirect(next_page)
+            except:
+                return redirect('dashboard')
+                
         else:
             messages.error(request, "Invalid login credentials")
             return redirect('login')
