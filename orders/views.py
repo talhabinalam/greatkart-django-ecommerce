@@ -1,8 +1,40 @@
 from django.shortcuts import render, redirect, HttpResponse
 from carts.models import CartItem
 from .forms import OrderForm
-from .models import Order
+from .models import Order, Payment
 import datetime
+from django.conf import settings
+import json
+
+
+def payments(request):
+    body = json.loads(request.body)
+    order = Order.objects.get(user=request.user, is_ordered=False, order_number=body['orderID'])
+    
+    # Store transction details inside payment model
+    payment = Payment(
+        user = request.user,
+        payment_id = body['transactionID'],
+        payment_method = body['payment_method'],
+        amount_paid = order.order_total,
+        status = body['status'],
+    )
+    payment.save()
+    order.payment = payment
+    order.is_ordered = True
+    order.save()
+    
+    # Move the cart items to Order Product table
+    
+    # Reduce the quantity of the sold product
+    
+    # Clear cart
+    
+    # Send order recieved email to customer
+    
+    # Send order number and transaction id back to 
+    
+    return render(request, 'orders/payments.html')
 
 
 def place_order(request, total=0, quantity=0,):
@@ -52,9 +84,16 @@ def place_order(request, total=0, quantity=0,):
             order_number = current_date + str(data.id)
             data.order_number = order_number
             data.save()
+            order = Order.objects.get(user=current_user, is_ordered=False, order_number=order_number)
+            context = {
+                'order': order,
+                'cart_items': cart_items,
+                'total': total,
+                'tax': tax,
+                'grand_total': grand_total,
+                'paypal_client_id': settings.PAYPAL_CLIENT_ID
+            }
             
-            return redirect('checkout')
+            return render(request, 'orders/payments.html', context)
     else:
         return redirect('checkout')
-    
-    return render(request, 'store/checkout.html', {'form': form})
