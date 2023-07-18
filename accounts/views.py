@@ -4,7 +4,7 @@ from .models import Account, UserProfile
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required
 from carts.models import Cart, CartItem
-from orders.models import Order
+from orders.models import Order, OrderProduct
 from carts.views import _cart_id
 from django.contrib.auth import update_session_auth_hash
 
@@ -143,18 +143,6 @@ def activate(request, uidb64, token):
         return redirect('register')
     
 
-@login_required
-def dashboard(request):
-    orders = Order.objects.order_by('-created_at').filter(user_id=request.user.id, is_ordered=True)
-    userprofile = get_object_or_404(UserProfile, user=request.user)
-    orders_count = orders.count()
-    context = {
-        'orders_count': orders_count,
-        'userprofile': userprofile,
-    }
-    return render(request, 'accounts/dashboard.html', context)
-
-
 def forgot_password(request):
     if request.method == 'POST':
         email = request.POST['email']
@@ -229,29 +217,6 @@ def my_orders(request):
 
 
 @login_required
-def edit_profile(request):
-    userprofile = get_object_or_404(UserProfile, user=request.user)
-    if request.method == 'POST':
-        user_form = UserForm(request.POST, instance=request.user)
-        profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile)
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-            messages.success(request, "Your Profile has been updated.")
-            return redirect('edit_profile')
-    else:
-        user_form = UserForm(instance=request.user)
-        profile_form = UserProfileForm(instance=userprofile)
-        context = {
-            'user_form': user_form,
-            'profile_form': profile_form,
-            'userprofile': userprofile,
-        }
-        
-    return render(request, 'accounts/edit_profile.html', context)
-
-
-@login_required
 def change_password(request):
     if request.method == 'POST':
         current_password = request.POST['current_password']
@@ -275,3 +240,84 @@ def change_password(request):
             return redirect('change_password')
 
     return render(request, 'accounts/change_password.html')
+
+
+@login_required
+def dashboard(request):
+    orders = Order.objects.order_by('-created_at').filter(user_id=request.user.id, is_ordered=True)
+    
+    try:
+        userprofile = UserProfile.objects.get(user=request.user)
+    except UserProfile.DoesNotExist:
+        userprofile = UserProfile(user=request.user)
+        userprofile.save()
+
+    # If the profile picture is empty, assign the default profile picture
+    if not userprofile.profile_picture:
+        userprofile.profile_picture = 'userprofile/default_profile_picture.jpg'
+
+    orders_count = orders.count()
+    context = {
+        'orders_count': orders_count,
+        'userprofile': userprofile,
+    }
+    return render(request, 'accounts/dashboard.html', context)
+
+
+
+@login_required
+def edit_profile(request):
+    try:
+        userprofile = request.user.userprofile
+    except UserProfile.DoesNotExist:
+        userprofile = UserProfile(user=request.user)
+    
+    if request.method == 'POST':
+        user_form = UserForm(request.POST, instance=request.user)
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            # Check if a new profile picture was provided
+            if 'profile_picture' in request.FILES:
+                userprofile.profile_picture = request.FILES['profile_picture']
+            else:
+                userprofile.profile_picture = None  # Set the profile picture to None if not provided
+            userprofile.save()
+            messages.success(request, "Your profile has been updated.")
+            return redirect('dashboard')
+    else:
+        user_form = UserForm(instance=request.user)
+        profile_form = UserProfileForm(instance=userprofile)
+
+    # If the profile picture is empty, assign the default profile picture
+    if not userprofile.profile_picture:
+        userprofile.profile_picture = 'userprofile/default_profile_picture.jpg'
+    
+    context = {
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'userprofile': userprofile,
+    }
+        
+    return render(request, 'accounts/edit_profile.html', context)
+
+
+@login_required
+def order_details(request, order_id):
+    order_details = OrderProduct.objects.filter(order__order_number=order_id)
+    order = Order.objects.get(order_number=order_id)
+    sub_total = 0
+    for i in order_details:
+        sub_total += i.product_price * i.quantity
+        
+    context = {
+        'order_details': order_details,
+        'order': order,
+        'sub_total': sub_total,
+    }
+    
+    return render(request, 'accounts/order_details.html', context)
+
+

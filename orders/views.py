@@ -11,6 +11,7 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 
 
+
 def payments(request):
     body = json.loads(request.body)
     order = Order.objects.get(user=request.user, is_ordered=False, order_number=body['orderID'])
@@ -70,7 +71,6 @@ def payments(request):
         'order_number': order.order_number,
         'transactionID': payment.payment_id,
     }
-    
     return JsonResponse(data)
 
 
