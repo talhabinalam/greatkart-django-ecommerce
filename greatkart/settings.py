@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "store",
     "carts",
     "orders",
+    "contact",
 ]
 
 MIDDLEWARE = [
@@ -154,4 +155,4 @@ EMAIL_HOST_PASSWORD = config('EMAIL_PASS')
 EMAIL_USE_TLS = True
 
 PAYPAL_CLIENT_ID = config('PAYPAL_ID')
-PAYPAL_CLIENT_SECRET = config('PAYPAL_KEY')
+PAYPAL_CLIENT_SECRET = config('PAYPAL_SECRET_KEY')
