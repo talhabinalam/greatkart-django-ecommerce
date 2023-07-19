@@ -1,14 +1,17 @@
-from django.shortcuts import render
-from .models import ContactUs
-from .forms import ContactUsForm
+from django.shortcuts import render, redirect
+from .forms import ContactForm
+from django.contrib import messages
 
-
-def contactus(request):
+def contact(request):
     if request.method == 'POST':
-        form = ContactUsForm(request.POST)
+        form = ContactForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, "Thanks for contacting us. We will reach out to you soon !")
+            return redirect('contact')
     else:
-        form = ContactUsForm()
-        
-    return render(request, 'contactus.html', {'form':form})
+        form = ContactForm()
+
+    return render(request, 'contact.html', {'form': form})
+
+
