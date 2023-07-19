@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -147,10 +148,10 @@ MESSAGE_TAGS = {
 # SMTP Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_POST = 587
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
+EMAIL_PORT = 587
+EMAIL_HOST_USER = config('EMAIL_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_PASS')
 EMAIL_USE_TLS = True
 
-PAYPAL_CLIENT_ID = "ATYgyVKaUUXevbEABx70fmH_hMP_XHqlCFuEcyA6zVOjU_sAleyrggjVX7EUmagmUKjsTu1ioReVqamD"
-PAYPAL_CLIENT_SECRET = "EFCImllKFD6irF7xsSOMBAKshdDGI_UBs768csvW9qSlcB43nCjEluPhqCCkYtATtwhCm6zSLVSU1C2W"
+PAYPAL_CLIENT_ID = config('PAYPAL_ID')
+PAYPAL_CLIENT_SECRET = config('PAYPAL_KEY')

@@ -3,6 +3,7 @@ from store.models import Product, Variation
 from carts.models import Cart, CartItem
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
+from accounts.models import UserProfile
 
 
 def _cart_id(request):
@@ -177,33 +178,38 @@ def remove_cart_item(request, product_id, cart_item_id):
         cart_item = CartItem.objects.get(product=product, cart=cart, id=cart_item_id)
     cart_item.delete()
     
-    return redirect('cart')
-        
+    return redirect('cart')       
 
-@login_required()
-def checkout(request, total=0, quantity=0, cart_items=None):
+
+@login_required
+def checkout(request):
     try:
-        tax = 0
-        grand_total = 0
-        if request.user.is_authenticated:
-            cart_items = CartItem.objects.filter(user=request.user, is_active=True)
-        else:
-            cart = Cart.objects.get(cart_id=_cart_id(request))
-            cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+        # Retrieve user and cart information
+        user = request.user
+        user_profile = UserProfile.objects.get(user=user) 
+        cart_items = CartItem.objects.filter(user=user, is_active=True)
+
+        total = 0
+        quantity = 0
         for cart_item in cart_items:
-            total += (cart_item.product.price * cart_item.quantity)
+            total += cart_item.product.price * cart_item.quantity
             quantity += cart_item.quantity
-        tax = (2 * total)/100
+        tax = (2 * total) / 100
         grand_total = total + tax
     except ObjectDoesNotExist:
-        pass
-    
+        total = 0
+        quantity = 0
+        tax = 0
+        grand_total = 0
+        cart_items = None
+
     context = {
         'total': total,
         'quantity': quantity,
         'cart_items': cart_items,
-        'tax': tax, 
+        'tax': tax,
         'grand_total': grand_total,
+        'user_profile': user_profile, 
     }
-    
+
     return render(request, 'store/checkout.html', context)

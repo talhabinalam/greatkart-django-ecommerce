@@ -264,27 +264,23 @@ def dashboard(request):
     return render(request, 'accounts/dashboard.html', context)
 
 
-
 @login_required
 def edit_profile(request):
     try:
         userprofile = request.user.userprofile
     except UserProfile.DoesNotExist:
         userprofile = UserProfile(user=request.user)
-    
+
     if request.method == 'POST':
         user_form = UserForm(request.POST, instance=request.user)
         profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile)
 
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
-            profile_form.save()
             # Check if a new profile picture was provided
             if 'profile_picture' in request.FILES:
-                userprofile.profile_picture = request.FILES['profile_picture']
-            else:
-                userprofile.profile_picture = None  # Set the profile picture to None if not provided
-            userprofile.save()
+                profile_form.instance.profile_picture = request.FILES['profile_picture']
+            profile_form.save()
             messages.success(request, "Your profile has been updated.")
             return redirect('dashboard')
     else:
@@ -294,14 +290,15 @@ def edit_profile(request):
     # If the profile picture is empty, assign the default profile picture
     if not userprofile.profile_picture:
         userprofile.profile_picture = 'userprofile/default_profile_picture.jpg'
-    
+
     context = {
         'user_form': user_form,
         'profile_form': profile_form,
         'userprofile': userprofile,
     }
-        
+
     return render(request, 'accounts/edit_profile.html', context)
+
 
 
 @login_required
@@ -319,5 +316,4 @@ def order_details(request, order_id):
     }
     
     return render(request, 'accounts/order_details.html', context)
-
 

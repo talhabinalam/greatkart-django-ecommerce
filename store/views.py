@@ -8,6 +8,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from .forms import ReviewFrom
 from django.contrib import messages
+from .models import Account
 
 
 def store(request, category_slug=None):
@@ -60,12 +61,14 @@ def product_detail(request, category_slug, product_slug):
         
     # Getting the reviews
     reviews = ReviewRating.objects.filter(product_id=product.id, status=True)
+    reviewers = Account.objects.filter(reviewrating__product_id=product.id).distinct()
     
     context = {
         'product': product,
         'in_cart': in_cart,
         'orderproduct': orderproduct,
         'reviews': reviews,
+        'reviewers': reviewers,
     }
     
     return render(request, 'store/product_detail.html', context)
@@ -100,7 +103,6 @@ def submit_review(request, product_id):
             form = ReviewFrom(request.POST)
             if form.is_valid():
                 data = ReviewRating()
-                data.subject = form.cleaned_data['subject']
                 data.rating = form.cleaned_data['rating']
                 data.review = form.cleaned_data['review']
                 data.ip = request.META.get('REMOTE_ADDR')

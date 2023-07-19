@@ -56,8 +56,15 @@ $(document).ready(function() {
 
     
 }); 
-// // jquery end
+// jquery end
 
-// setTimeout(function(){
-//     $('#message').fadeOut('slow')
-// }, 10000)
+
+setTimeout(function(){
+    $('#message').fadeOut('slow')
+}, 6000)
+
+
+$(document).ready(function() {
+    $('.carousel').carousel();
+  });
+  
