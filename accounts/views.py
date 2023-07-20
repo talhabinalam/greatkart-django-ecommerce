@@ -197,7 +197,7 @@ def reset_password(request):
             user = Account.objects.get(pk=uid)
             user.set_password(password)
             user.save()
-            messages.success(request, "Password reset successful!")
+            messages.success(request, "Password reset successfully!")
             return redirect('login')
         
         else:

@@ -150,9 +150,10 @@ MESSAGE_TAGS = {
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_PASS')
-EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = config('EMAIL_FROM')
 
 PAYPAL_CLIENT_ID = config('PAYPAL_ID')
 PAYPAL_CLIENT_SECRET = config('PAYPAL_SECRET_KEY')
