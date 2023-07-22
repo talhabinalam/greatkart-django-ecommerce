@@ -257,9 +257,15 @@ def dashboard(request):
         userprofile.profile_picture = 'userprofile/default_profile_picture.jpg'
 
     orders_count = orders.count()
+    
+    is_active = request.user.is_active
+    is_admin = request.user.is_superadmin
+    
     context = {
         'orders_count': orders_count,
         'userprofile': userprofile,
+        'is_active': is_active,
+        'is_admin': is_admin
     }
     return render(request, 'accounts/dashboard.html', context)
 
